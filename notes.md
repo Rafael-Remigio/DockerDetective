@@ -1,4 +1,8 @@
-# Notes from the different pappers
+# Notes from the different pappers and Docker Documentation
+
+
+# About Docker
+
 
 ## Docker API
 
@@ -43,6 +47,35 @@ Advantages of using Docker Layers
 Docker Layers and Cache are important concepts when it comes to adopting good practices of creating any Docker infrastructure. Small tweaks here and there can increase the efficiency of scalability and deployments.
 
 I have tried to explain the concepts in a simple and easy to understand language here to make readers interested into using these in their docker practices.
+
+## Four Basic Modes of Docker Network
+
+https://community.pivotal.io/s/article/Explaining-Four-Basic-Modes-of-Docker-Network?language=en_US
+
+* **Bridge Mode Networking**
+
+    When docker daemon bootstrapped, a virtual bridge called docker0 will be created, and all the nic created in containers will connect to this bridge. It is working in layer2. IP address will be allocated in a subnet of docker0, and the gateway is docker0. Virtual nic pair will be created, in container side it is eth0, in host side it is vethxxx (naming like this), vethxxx will be added to docker0 bridge afterwards. If you use "docker run -p" to do port mapping, iptables rules will be created to do port mapping work between container and host.
+
+    <img src="images/bridge.jpeg">
+
+
+* **Host Mode Networking**
+
+    When create and bootstrap container using host mode, this container will not have a unique network namespace, but share network namespace with the host. No virtual nic would be created and no IP address will be allocated. But filesystem, proc information is isolated from the host.
+
+    <img src="images/host.jpeg">
+
+* **Container Mode Networking**
+
+    In this mode, the newly created container will share the same network namespace with an existing container. New container will not create its own nic and allocate new IP, it shares IP address and port with the existing container. And the same, except network, filesystem and proc information are isolated. This mod is very like Kubernetes' pod infrastructure.
+
+    <img src="images/container-mode.jpeg">
+
+* **None Mode**
+
+    In this mode, docker container has its own network namespace, but no network configuration would be done for it, which means docker has no nic, IP address, routing information. We could add them once we are going to do it.
+
+# Papers
 
 ## Insight from a Docker Container Introspection 
 
@@ -494,3 +527,94 @@ done
 ```
 
 ## Security Analysis and Threats Detection Techniques on Docker Container
+
+```
+Theo et al.
+proposed the notion of ecosystem security for Docker
+container and argues that the security of third-party modules
+and security in the Docker development lifecycle should be
+strengthened [14]. Yet, no detailed solution is proposed. The
+mainstream Docker scanning tools include Clair,
+DockerScan, Anchore and so forth. However, they mainly
+focus on the static security, i.e. only focus on the threats on
+Docker images, but cannot provide the dynamic monitoring
+for the running Docker container instances. Moreover, P.
+Salvatore et al. mentioned that Docker monitoring needs to
+consider the updating problems of Docker container, which
+means the monitor system has to keep pace with the rapid
+changing Docker container’s life-cycle [15].
+```
+
+```
+Compared to the existing work on Docker security, this
+work has the following novelties.
+* We make a detailed analysis on the existing
+mechanisms inside Docker container technology and
+thoroughly discuss the threats for Docker container
+from various aspects.
+* Apart from theoretical analysis for Docker container,
+we propose a comprehensive threats detection
+framework for Docker container and conduct a
+detailed experiment which proves the effectiveness
+of this framework.
+* The proposed detection framework can not only
+recognize the risks form static Docker image by
+scanning malicious files and vulnerabilities, but also
+promise the security of the dynamic Docker
+container instance by monitoring the DoS risks and
+dangerous IP/DNS requests.
+* By introducing the machine learning techniques, we
+can predict the unknown threats which are not
+recorded in some threat intelligence databases like
+common vulnerabilities and exposures (CVE) or
+blacklists of malicious domain
+```
+
+### EXISTING SECURITY MECHANISMS FOR DOCKER CONTAINERS
+
+```
+Docker container does not isolate the virtual objects via
+virtualizing hardware or using an independent operating
+system. Rather, it uses the Namespace mechanism in Linux
+to promise the secure isolation of running environments and
+uses the Cgroup mechanism in Linux to realize the
+management of computer resources. Moreover, it utilizes the
+kernel capability to reinforce the security [16
+```
+
+```
+Isolated containers
+cannot access the resource from other containers and thus
+promises the transparency of computer resource access [17].
+By Namespace, each container instance can have its own
+complete network, file system, IPC (Inner-Process
+Communication
+```
+
+### THREATS ANALYSIS FOR DOCKER CONTAINER
+
+* Components Security
+* Container Escape Attack
+* Sensitive Information Leakage
+* Network Mode Security
+
+### DOCKER THREATS DETECTION FRAMEWORK
+
+
+```
+The detection considers
+two aspects of security: docker image security and container
+instance security. For docker image, we detect the
+vulnerabilities and exposures of pre-installed applications by
+CVE (Common Vulnerabilities & Exposures) database and
+use malicious signature database to achieve the goal of
+finding out malicious files. Yet, these two detections can
+only find the known threats which are stored in the public
+databases. Hence, we introduce a malicious predicting
+module based on machine learning algorithm, which can
+predict the potential malicious files and thus prevent the
+unknown attacks. For running container instance, we monitor
+two aspects: computer resource usage and IP/DNS requests
+```
+
+Good article, not very usefull for our porpuse of forensics post mortum. Good for the report as a reference maybe
