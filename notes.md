@@ -3,6 +3,42 @@
 
 # About Docker
 
+## Docker vs VMs
+
+The difference between the Containers and the Virtual
+Machines lies in the underlying virtualization technology used
+by them, which creates a major difference in their
+performance. Containers share the host OS kernel, which leads
+to the lack of isolation. Virtual machines, on the other hand, run in a
+hypervisor environment where each VM is required to have its
+own dedicated OS and other resources like related binaries,
+libraries and application files. This not only consumes a
+significant amount of system resources but also creates a huge
+overhead, when multiple VMs are made to run on the same
+physical server. A container takes just seconds to start while a VM
+might take several minutes as startup time
+
+<img src="images/docker-vs-VM.png">
+
+### Docker Containers 
+
+Tools like Docker make use of the container engines.
+Here, containers act as portable means to encapsulate the
+applications and their dependencies. As a result, managing
+dependencies between containers in multi-tier applications
+becomes quite a challenge. Containers isolate processes
+from each other. A simple architecture of Docker container is
+depicted in the Figure bellow. The core of Docker consists of Linux
+Containers and LXC. LXC is a user-space control package
+used for Linux Containers. It also provides components like
+Control Groups (Cgroups). The main functionality of the
+kernel-level namespaces provided by LXC is to provide
+isolation between host and the container. Cgroups help Docker
+to limit the consumption of resources by a container and they
+also provide certain metrics to monitor the resource
+consumption of the various processes within the containers.
+
+<img src="images/docker-container-arch.png">
 
 ## Docker API
 
@@ -22,6 +58,23 @@ Dumping process memory from docker container:
 
 
 ## Docker File System Layers 
+
+By default, all the changes made inside the container are
+stored in the writable layer of the container built on the top of
+the read only layer of images. This means that:
+* Once the container is deleted, all the data inside the
+container won’t persist.
+* There is a tight coupling between the writable layer
+of the container and the host machine due to which
+the movement of data from one location to the other
+would be difficult.
+* In order to write something into a container's writable
+layer, there would be a requirement of a storage
+driver to manage the filesystem. By using data
+volumes, we can write directly to the host filesystem.
+
+To persist data, Docker has two options for storing files
+on the host machine: volumes, and bind mounts.
 
 For more info there is this video:
 
@@ -47,6 +100,23 @@ Advantages of using Docker Layers
 Docker Layers and Cache are important concepts when it comes to adopting good practices of creating any Docker infrastructure. Small tweaks here and there can increase the efficiency of scalability and deployments.
 
 I have tried to explain the concepts in a simple and easy to understand language here to make readers interested into using these in their docker practices.
+
+## Volumes
+
+Volumes are managed by Docker and are the best
+way to persist data. They are stored in a part of the
+host file system. (/var/lib/docker/volumes/ on Linux). Non-Docker
+processes are not allowed to modify this part of the
+filesystem. Volume upon creation is stored within a
+directory on the Docker host. On mounting the
+volume to a container, this directory is what is
+mounted into the container. Any given volume can be
+mounted to multiple containers at the same time.
+Even if no container is using a volume, it is still
+available to use and is not deleted automatically
+
+<img src="images/volumes.jpg">
+
 
 ## Four Basic Modes of Docker Network
 
@@ -618,3 +688,44 @@ two aspects: computer resource usage and IP/DNS requests
 ```
 
 Good article, not very usefull for our porpuse of forensics post mortum. Good for the report as a reference maybe
+
+
+## Evaluation of File Carving Tools for Forensic Investigation in Docker Containers
+
+###  BACKGROUND
+This section aims to provide detailed background knowledge
+of various concepts involved in this paper.
+
+### File carving
+```
+after a file is deleted, only the pointer pointing to the
+location of the files on the disk is removed. The storage space
+at which the data of the deleted file is located is now available
+for new data to be stored. As long as this new data has not
+been overwritten over that space, the contents of the deleted
+file can be recovered via certain forensic technique
+
+There are many File Carving Tools available in the market
+for Linux. Some of the popular ones are: PhotoRec, Scalpel,
+Foremost, Bulk Extractor with Record Carving and TestDisk
+```
+### Results
+```
+From the experiments conducted, we can conclude that the
+container forensic investigation does not differ much from an
+ordinary forensic investigation on a host machine. The same
+tools can be used to successfully extract data from containers
+as well. File carving attempts to recover deleted files. This,
+however, does not always succeed and is dependent on
+multiple factors. The overall good success rate of the file
+carving performed in our experiments indicates that it can be a
+viable and effective method of extracting data from removed
+containers. All the file carving tools used in the experiments
+got almost similar performances for certain file types (jpg and
+pdf). None of the tools were able to recover the docx file type.
+However, overall the performance of Scalpel and Foremost
+comes out to be better as compared to the Photorec in our
+experiments
+```
+
+I don't thing file carving will be implemented but it is good to know that it does not differ from simillar recovery techniques on Linux Machines.

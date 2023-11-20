@@ -8,7 +8,6 @@
 * https://dl.acm.org/doi/abs/10.1145/3199478.3199506
 * https://static.ernw.de/whitepaper/ERNW_Whitepaper64_IncidentForensicDocker_signed.pdf
 * https://ieeexplore.ieee.org/abstract/document/9064441
-* https://mauricon.org/conferences/index.php/iconic/article/view/6
 * https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9997954
 
 ### Links
