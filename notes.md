@@ -19,6 +19,10 @@ Dumping process memory from docker container:
 
 ## Docker File System Layers 
 
+For more info there is this video:
+
+<iframe src="https://www.youtube.com/watch?v=Bc0iWolzaz4"></iframe>
+
 <img src="images/docker-layers.jpg">
 
 An image has many layers. When a container starts, only one read-write layer is attached on top of all the layers of images.
