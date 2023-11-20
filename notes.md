@@ -115,7 +115,7 @@ mounted to multiple containers at the same time.
 Even if no container is using a volume, it is still
 available to use and is not deleted automatically
 
-<img src="images/volumes.jpg">
+<img src="images/volumes.png">
 
 
 ## Four Basic Modes of Docker Network
