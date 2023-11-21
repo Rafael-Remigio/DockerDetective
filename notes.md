@@ -849,3 +849,152 @@ In the event an incident occurs, it is critical to preserve the evidence that’
 * Determine which evidence you plan to capture and ensure its enough visibility to determine root cause and impact — remember, the more data sources you can analyze, the better your investigation will be
 * Have a plan for how to capture the data you need and test your ability to capture it- given the dynamic and ephemeral nature of containers, automation is key
 * Know how to snapshot the host that contains the containerized disks
+
+
+## Red Hat blog - Docker Forensics for Containers: How to Conduct Investigations
+
+Containers make digital forensics incredibly complex, as they are scheduled and orchestrated across different hosts according to usage and need. Furthermore, container environments yield enormous amounts of data at high velocity, which is difficult to capture without the right type of instrumentation and tools.
+
+Containers differ from bare metal or virtual machines in a number of ways that impact obtaining actionable evidence. At this time there is no default “container snapshot” function available; containers must be captured as a set of distinct components.
+
+### File System
+
+Leading container runtimes use a copy-on-write file system. This is a great advantage to forensic acquisition. All of the default system and application files exist within the container image. Any changes since the container started are stored in a separate directory from the original image. Furthermore, any deletion of original files from the image is also recorded.
+
+But we can go one step further: Docker will capture all file modifications, since the container was started into a new layer on the copy-on-write file system. Simply commit an existing container, running or not, into a new image: ```docker commit $CONTAINER_ID imagename```. Committing a container into a new image does not otherwise modify the container in any way. Note that committing a container differs from snapshotting a VM. Committing only records file system changes, but not the current process execution state.
+
+### MEMORY
+
+Processes running inside a container manage memory the same as any other process. By default, processes inside a container may not interact or interfere with memory controlled by any process outside the container. This provides the following characteristic: if you capture all of the memory for each process in a container, you have captured all allocated memory for that container.
+
+There exist multiple per-process memory dump utilities in linux. The utility
+gcore suspends the process during acquisition but does not modify it; it executes it quickly, and the output format is compatible with YARA.
+
+### Shared Volumes
+
+Containers are ephemeral. Malware might not be aware of this and write some interesting data to the container’s allocated disk space. Ultimately the most sensitive data is likely stored via a volume
+
+Identifying the volume mount is simple; one inspects the container. Volumes are identified via the Volume and Mount configuration. Existing examination techniques will be needed for each backing service.
+
+### Container escape
+
+There are vulnerabilities and misconfigurations that could allow malware to escape a container. If there is any evidence of suspicious behavior on the host itself, or evidence of this type of malware, it is prudent to image the entire host, whether bare-metal or VM.
+
+A container may not be fully isolated in some cases, but until there is evidence of an
+isolation bypass, one may assume that the suspicious behavior is constrained to the container’s environment.
+
+Basically it's very hard to leave a container unless there are some serius misconfiguration.
+
+To configure isolation in a secure way we need:
+
+
+### Containers in a forensic environment
+
+There isn’t a formal mechanism for running a captured container. Once they’re shut down, even if both file
+system and memory contents are exported, there is no mechanism for combining the two back into the previous running state. Containers are designed to be ephemeral and allocate new memory on startup.
+
+For forensics it is better to have the container running. If the container needs to be isolated there are two possibilities:
+
+* First, containers may be paused at any time. Container execution is completely suspended, memory remains allocated, volumes remain mounted, etc. Any malware currently executing is interrupted.
+* Second, containers may be quarantined by removing network access or system call privileges. The container processes – and possibly the malware – will continue to execute, but will be unable to send, receive, read, or write any data, or even unmap existing memory
+
+
+
+## EFORENSICS: Digital Forensics in Docker Environments: Challenges and Solutions
+
+By understanding these challenges and implementing appropriate solutions, forensic investigators can effectively analyze Docker containers and preserve crucial evidence. 
+
+### Isolation and Containerization Challenges 
+
+Docker containers are designed to be self-contained and isolated from the host system and other containers. beneficial for security and performance but it poses challenges when it comes to forensic analysis. 
+
+### Volatility and Transience of Containers 
+
+Docker containers are inherently volatile and transient, with the ability to be created, destroyed, and re-created easily.
+
+Traditional forensic approaches may not be suitable for dynamic Docker environments. Investigators need to adapt their techniques to capture and analyze data from running containers, considering the frequent creation and deletion of containers.
+
+### Distributed and Orchestration Challenges
+
+In distributed Docker environments, containers can be spread across multiple hosts, making evidence collection and analysis more challenging. 
+
+container orchestration systems and the associated metadata becomes crucial for understanding the context and relationships between containers.
+
+Basically the issue is that it's not just one highly volitile machine, it's possibly many, spread sometimes across multiple machines.
+
+### Encryption and Secure Communication 
+
+Communication between docker components is often encrypted as if it were differente machine even on the same enviorment. Encryption may hinder investigators' ability to access and analyze container communications,
+
+### Forensics artifacts
+
+In Docker environments, the traditional approach to identifying and preserving forensic artifacts needs adaptation. Investigators must familiarize themselves with Docker-specific artifacts such as container images, layers, volumes, and network configurations.
+
+### Dynamic Network and IP Addressing
+
+Docker containers can have dynamically assigned IP addresses and network configurations, making it difficult for investigators to track and analyze network communications. Traditional network forensic techniques that rely on static IP addresses and network flow analysis may not be applicable in this dynamic environment. 
+
+<img src="images/docker-network.png">
+
+### Solutions
+
+*leveraging Docker's logging capabilities and system auditing features can provide valuable insights for forensic analysis.
+
+* specialized forensic tools and techniques designed for Docker environments can assist in acquiring and analyzing containerized data
+
+
+## EForensics - Security Assessment Tools for Docker Containers
+
+Docker containers are attractive target for attackers or a potential hiding place for bad actors planning malicious activities. Docker forensics involves understanding the internal workings of containers, their file systems, network configurations, and runtime artifacts to uncover valuable evidence during an investigation.
+
+### Challenges in Docker Forensics
+
+* Containers can be created, modified, and destroyed rapidly, potentially leading to
+the loss of critical evidence, which is often the case.
+* Secondly, the layered
+architecture of Docker images adds complexity to the forensic process, as each
+layer may introduce additional artifacts or hidden data, such as slack space or the
+lack of. 
+* Thirdly, the distributed nature of container environments, such as container
+orchestration platforms like Kubernetes, further complicates the forensic analysis
+by involving multiple hosts and interconnected components.
+
+### Techniques and Tools for Docker Forensics
+
+* Firstly, the collection and preservation of Docker artifacts are paramount. These
+include Docker images, container metadata, logs, and configuration files.
+Techniques like live acquisition, memory forensics, or disk imaging can be
+employed to capture container states and related data for analysis. 
+* Tools such as Docker Bench, Docker Security Scanning, or Trivy can help identify vulnerabilities
+or misconfigurations that might have been or able to be exploited for nefarious
+purposes.
+* Other specialized tools like RegRipper (https://github.com/keydet89/RegRipper3.0,n.d.), or Autopsy (https://www.sleuthkit.org/autopsy/, n.d.) can be used to parse the
+container file system and extract relevant artifacts, such as logs, configuration
+files, or user account information
+* network analysis tools like Wireshark can be employed to inspect network traffic generated by Docker
+containers, revealing potential communication with external entities or suspicious
+patterns
+* Memory forensics also plays a crucial role in traditional digital investigations. Tools
+like Volatility, which is not covered within the scope of this article, can be applied
+to extract the target information for analysis. However, conducting memory
+analysis in Docker containers introduces some additional challenges
+
+### DockerBench
+
+Docker Bench is an open-source security auditing tool designed to assess the
+security configuration of Docker containers and host systems
+
+is widely used to evaluate Docker deployments against recommended
+best practices and security benchmarks
+
+
+### Trivy
+Trivy is also an open-source vulnerability scanner specifically designed for
+containerized environments.
+
+Trivy can also analyze a local file system with a simple
+command, “trivy fs.” Forensically speaking, this is super helpful and makes Trivy a
+great tool not just for docker containers.
+
+
+## EForensics - Forensic Investigation in Docker Environments: Unraveling the Secrets of Containers
