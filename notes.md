@@ -729,3 +729,123 @@ experiments
 ```
 
 I don't thing file carving will be implemented but it is good to know that it does not differ from simillar recovery techniques on Linux Machines.
+
+
+# Online article and Posts
+
+## hacktricks
+
+### Container modification
+
+Find the modifications done to this container with regards to the image with:
+
+```
+docker diff wordpress
+C /var
+C /var/lib
+C /var/lib/mysql
+A /var/lib/mysql/ib_logfile0
+A /var/lib/mysql/ib_logfile1
+A /var/lib/mysql/ibdata1
+A /var/lib/mysql/mysql
+A /var/lib/mysql/mysql/time_zone_leap_second.MYI
+A /var/lib/mysql/mysql/general_log.CSV
+```
+
+In the previous command C means Changed and A, Added.
+If you find that some interesting file like /etc/shadow was modified you can download it from the container to check for malicious activity with:
+
+```
+docker cp wordpress:/etc/shadow.
+```
+
+Compare it with the original one running a new container and extracting the file from it:
+
+docker run -d lamp-wordpress
+docker cp b5d53e8b468e:/etc/shadow original_shadow #Get the file from the newly created container
+diff original_shadow shadow
+
+
+### Image modifications
+
+When you are given an exported docker image (probably in .tar format) you can use [container-diff](https://github.com/GoogleContainerTools/container-diff/releases) to extract a summary of the modifications.
+
+
+### Basic Analysis
+
+You can get basic information from the image running:
+
+```
+docker inspect <image> 
+```
+
+You can also get a summary history of changes with:
+```
+docker history --no-trunc <image>
+```
+
+### Credentials from memory
+
+Note that when you run a docker container inside a host you can see the processes running on the container from the host just running ps -ef
+
+Therefore (as root) you can dump the memory of the processes from the host and search for credentials
+https://book.hacktricks.xyz/linux-hardening/privilege-escalation#process-memory7
+
+
+## compass-security
+
+### Wrong Assumptions
+
+```
+At first, I made some wrong assumptions about docker persistence. I though only the Volumes and Bind Mounts you add are kept when containers are stopped. This is not correct.
+
+As soon as a Docker Image is converted to a Container (docker run), a Union Filesystem is created in the according subdirectory in /var/lib/docker . Any data the Container read and writes is stored in this filesystem. If you stop a Container the data is still there and you can start the Container again and continue where you left off. Also the log file in /var/lib/docker/containers/YOURCONTAINERID/YOURCONTAINERID.log is persistent.
+
+However, if you delete the container (docker rm) you loose all persistent data except the Volumes and Bind Mounts. Unfortunately this is was happened on the analyzed system and a lot of potentially interesting data was gone.
+```
+
+### Volumes / Mount Binds / Tmpfs
+
+```
+Union filesystem provides persistence, its not the recommended way to persist data because if you delete a Container, the data is gone. Docker recommends to use Volumes and Mount Binds to persist data that is required to stay alive longer than the Container.
+
+Volumes in the end are again just folders inside of /var/lib/docker/volumes
+
+Mount Binds on the other hand are like soft links to the host file system whereas tmpfs only is in memory, therefore data is lost after the Container is stopped.
+```
+
+### Data
+
+```
+All data inside the Containers is available transparently to the host. It is mostly just scattered in those layer folders in /var/lib/docker
+
+It seemed that the used Docker orchestrator software, forwarded the NGINX Docker logs to the syslog of the host. This was extremely valuable, as all potential dangerous requests to all applications where recorded.
+```
+
+Very cool story not very usefull for this project
+
+## sysdig
+
+### Container Forensics Techniques
+
+There are various tools and techniques available for conducting container forensics. Some of the most commonly used tools and techniques include:
+
+* Image analysis: Analyzing container images to identify vulnerabilities, configuration issues, and other potential security threats.
+* Log analysis: Analyzing log files to identify suspicious activity, such as unexpected network connections or changes in resource utilization.
+* File system analysis: Analyzing the file system of a container to identify malicious files or modifications.
+* Memory analysis: Analyzing the memory of a container to identify malicious activity, such as malware infections.
+* Network analysis: Analyzing network traffic to identify potential security incidents, such as data breaches or malware infections.
+
+Docker includes tools for forensic analysis, such as the Docker CLI’s commands for accessing container metadata and the Docker API’s access to metadata and logs
+
+
+## cado security
+
+Preservation & Investigation
+
+In the event an incident occurs, it is critical to preserve the evidence that’s required to allow for an in-depth investigation:
+
+* Never destroy the node when compromised! This will make it impossible to identify root cause
+* Determine which evidence you plan to capture and ensure its enough visibility to determine root cause and impact — remember, the more data sources you can analyze, the better your investigation will be
+* Have a plan for how to capture the data you need and test your ability to capture it- given the dynamic and ephemeral nature of containers, automation is key
+* Know how to snapshot the host that contains the containerized disks

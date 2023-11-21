@@ -12,16 +12,12 @@
 
 ### Links
 
-* https://forensics.wiki/
-* https://tryhackme.com/module/digital-forensics-and-incident-response
-* https://tryhackme.com/module/incident-response-and-forensics
 * https://book.hacktricks.xyz/generic-methodologies-and-resources/basic-forensic-methodology/docker-forensics
 * https://github.com/docker-forensics-toolkit/toolkit
 * https://blog.compass-security.com/2021/11/docker-forensics/
-* https://pkgs.org/download/docker-forensics-toolkit
-* https://attackdefense.pentesteracademy.com/listingnoauth?labtype=container-security-image-security&subtype=container-security-image-security-forensics
 * https://sysdig.com/learn-cloud-native/detection-and-response/what-is-container-forensics-and-incident-response/
 * https://medium.com/@cloud_tips/container-forensics-and-incident-response-solutions-5eac456519e0
+* https://www.cadosecurity.com/docker-kubernetes-forensics-incident-response/?utm_source=medium
 
 ## Documentos
 
