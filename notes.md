@@ -998,3 +998,145 @@ great tool not just for docker containers.
 
 
 ## EForensics - Forensic Investigation in Docker Environments: Unraveling the Secrets of Containers
+
+Unlike traditional virtual machines, Docker containers do not
+have a complete operating system, which makes evidence collection and forensics
+difficult. Furthermore, the dynamics of containers, such as rapid creation,
+modification, and destruction, add to the complexity of investigations.
+
+### Challenges
+
+* Evidence Gathering: The transient nature of Docker containers makes evidence
+gathering a challenge. It is crucial to correctly identify and preserve relevant
+artifacts, such as container images, metadata, logs and associated file systems.
+* Data analysis: The lack of a complete operating system in Docker containers
+requires different forensic approaches. Data analysis must take into account the
+particularities of layered file systems, the interaction between containers, and the
+isolation techniques used.
+* Event reconstruction: The rapid creation and destruction of containers makes it
+difficult to accurately reconstruct events. It is necessary to track and correlate
+information dispersed in different containers and in distributed logs.
+
+### Techniques
+
+* Gathering evidence in Docker environments involves
+identifying and preserving relevant images, containers, volumes, networks, and
+metadata. This can be done through tools like the Docker CLI, Docker API, and
+image registries.
+* Data analysis: Forensics on Docker containers requires understanding layered file
+systems and extracting key information. Tools such as DFF (Docker Forensic
+Framework) and Autopsy can help analyze Docker containers.
+
+### Network
+
+<img src="images/docker-networks-diagram.png">
+
+
+Network Complexity: Docker has a complex set of networking features that can
+be challenging to configure and debug, especially in distributed environments.
+Setting up advanced networks like load balancers or multi-host networks can be
+tricky.
+
+
+### Collecting evidence
+
+specialized tools, such as the Docker Forensics Toolkit, to gather information
+about running containers.
+
+This command displays a detailed list of all running containers, including
+information such as ID, name, image, status, exposed port, and more.
+
+```docker-forensics container list```
+
+```docker-forensics containers info <ID of the container>```
+
+```docker-forensics images list```
+
+```docker-forensics images info <ID of the container>```
+
+```docker-forensics networks list```
+
+```docker-forensics volumes list```
+
+```docker-forensics container inspect <ID of the container>```
+
+```docker-forensics container logs <ID of the container>```
+
+```docker-forensics memory dump <ID of the container>```
+
+```docker-forensics diff <ID of the container>```
+
+### acquisition of container images for further analysis.
+
+1. Copy Image to Acquisition Directory: Copy the container image to the acquisition directory mounted on the temporary container.
+2. Remove temporary container: Remove the temporary container created for acquisition.
+
+### Exploring Docker logs and event logs to reconstruct suspicious activity.
+
+1. Identify the target container: Use the docker logs command to access the target
+container's logs.
+2. Explore specific logs: Use additional docker logs command options to explore
+specific logs, such as filtering by date or searching by keyword.
+    ```docker logs --since <initial_date> --until <final_date> <ID or container name>```
+3. export the logs and use other tools to analyze them
+    ```docker logs <id> > logs.txt```
+
+### Extraction of metadata and configuration information from containers.
+
+```docker inspect <id>```
+
+Metadata example:
+* Container ID
+* Container name
+* Image used
+* Environment Variables
+* Mounted directories
+* Exposed doors
+* Associated networks
+
+### Access the container shell
+
+```docker exec -it <contianer name or id> /bin/bash```
+
+### Run a container for network analysis:
+
+Within the network analysis container, use tools like Wireshark to capture and analyze network traffic.
+
+
+### Container memory access
+
+1. run an interactive session inside the container:
+    ```docker exec -it <container name or ir> /bin/bash```
+2. run volatility from inside the container. Profile should be the containers OS
+    ```volatility -f /proc/kcore --profile=<profile> pslist
+3. on host, extract the dump
+    ```docker exec <container name> cat /proc/kcore > memory_dump
+
+
+
+
+## Dump memory from container from host
+
+https://www.reddit.com/r/docker/comments/rcgzru/get_docker_container_memory_dump_for_analysis/
+
+
+Saw this is stackoverflow.
+```
+I used GNU Debugger or gdb for generating the core sump for a container from outside the container,
+
+    "sudo docker ps -a | grep service_container_name" to get the container id.
+    "sudo docker inspect [container id] | more" to get the parent PID
+    "pstree -pg [parent pid]" to get the child PID
+    "sudo ps -aux | grep [child pid]"
+    "sudo gcore PID"
+```
+
+
+
+## CRIU
+
+Checkpoint/Restore In Userspace, or CRIU (pronounced kree-oo, IPA: /krɪʊ/, Russian: криу), is a Linux software. It can freeze a running container (or an individual application) and checkpoint its state to disk. The data saved can be used to restore the application and run it exactly as it was during the time of the freeze. Using this functionality, application or container live migration, snapshots, remote debugging, and many other things are now possible.
+
+CRIU started as a project of Virtuozzo, and grew with the tremendous help from the community. It is currently used by (integrated into) OpenVZ, LXC/LXD, Docker, Podman, and other software, and packaged for many Linux distributions. 
+
+https://github.com/checkpoint-restore/criu
