@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Docker Images and Container IDs</title>
+    <style>
+        /* Styling for the accordion */
+        .accordion {
+            background-color: #90ec45;
+            color: rgb(51, 51, 51)000;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            transition: 0.4s;
+        }
+
+        .panel {
+            padding: 0 18px;
+            display: none;
+            overflow: hidden;
+            background-color: white;
+        }
+
+        .panel p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Accordions for Docker Container IDs -->
+<h2>Active Docker Containers</h2>
+
+{% for container in containers %}
+    {% if container.State == "running" %}
+    <button class="accordion">{{ container.Id }}</button>
+    <div class="panel">
+        <p>ID: {{ container.Id }}</p>
+        <p>Names: {{ container.Names | join(', ') }}</p>
+        <p>Image: {{ container.Image }}</p>
+        <p>Image ID: {{ container.ImageID }}</p>
+        <p>Command: {{ container.Command }}</p>
+        <p>Created: {{ container.Created }}</p>
+        <p>Ports:</p>
+        <ul>
+            {% for port in container.Ports %}
+            <li>IP: {{ port.IP }}, Private Port: {{ port.PrivatePort }}, Public Port: {{ port.PublicPort }}, Type: {{ port.Type }}</li>
+            {% endfor %}
+        </ul>
+        <p>State: {{ container.State }}</p>
+        <p>Status: {{ container.Status }}</p>
+        <p>Host Config: {{ container.HostConfig.NetworkMode }}</p>
+        <p>Network Settings:</p>
+        <ul>
+            {% for network_key, network_value in container.NetworkSettings.Networks.bridge.items() %}
+            <li>{{ network_key }}: {{ network_value }}</li>
+            {% endfor %}
+        </ul>
+        <p>Mounts:</p>
+        <ul>
+            {% for mount in container.Mounts %}
+            <li>Type: {{ mount.Type }}, Source: {{ mount.Source }}, Destination: {{ mount.Destination }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+{% endfor %}
+
+
+<!-- Accordions for Docker Container IDs -->
+<h2>All Docker Containers</h2>
+
+{% for container in containers %}
+    <button class="accordion">{{ container.Id }}</button>
+    <div class="panel">
+        <p>ID: {{ container.Id }}</p>
+        <p>Names: {{ container.Names | join(', ') }}</p>
+        <p>Image: {{ container.Image }}</p>
+        <p>Image ID: {{ container.ImageID }}</p>
+        <p>Command: {{ container.Command }}</p>
+        <p>Created: {{ container.Created }}</p>
+        <p>Ports:</p>
+        <ul>
+            {% for port in container.Ports %}
+            <li>IP: {{ port.IP }}, Private Port: {{ port.PrivatePort }}, Public Port: {{ port.PublicPort }}, Type: {{ port.Type }}</li>
+            {% endfor %}
+        </ul>
+        <p>State: {{ container.State }}</p>
+        <p>Status: {{ container.Status }}</p>
+        <p>Host Config: {{ container.HostConfig.NetworkMode }}</p>
+        <p>Network Settings:</p>
+        <ul>
+            {% for network_key, network_value in container.NetworkSettings.Networks.bridge.items() %}
+            <li>{{ network_key }}: {{ network_value }}</li>
+            {% endfor %}
+        </ul>
+        <p>Mounts:</p>
+        <ul>
+            {% for mount in container.Mounts %}
+            <li>Type: {{ mount.Type }}, Source: {{ mount.Source }}, Destination: {{ mount.Destination }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endfor %}
+
+
+<h2>Docker Images</h2>
+{% for image in images %}
+    <button class="accordion">{{ image.RepoTags[0]}}</button>
+    <div class="panel">
+        <p>Containers: {{ image.Containers }}</p>
+        <p>Created: {{ image.Created }}</p>
+        <p>ID: {{ image.Id }}</p>
+        <p>Labels:</p>
+        {% if image.Labels is not none %}
+        <ul>
+            {% for label_key, label_value in image.Labels.items() %}
+            <li>{{ label_key }}: {{ label_value }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <p>Parent ID: {{ image.ParentId }}</p>
+        <p>Repo Digests:</p>
+        <ul>
+            {% for digest in image.RepoDigests %}
+            <li>{{ digest }}</li>
+            {% endfor %}
+        </ul>
+        <p>Repo Tags:</p>
+        <ul>
+            {% for tag in image.RepoTags %}
+            <li>{{ tag }}</li>
+            {% endfor %}
+        </ul>
+        <p>Shared Size: {{ image.SharedSize }}</p>
+        <p>Size: {{ image.Size }}</p>
+        <p>Virtual Size: {{ image.VirtualSize }}</p>
+    </div>
+{% endfor %}
+
+
+
+<script>
+    // JavaScript to toggle the accordion panels
+    const accordions = document.querySelectorAll('.accordion');
+
+    accordions.forEach(accordion => {
+        accordion.addEventListener('click', function() {
+            this.classList.toggle('active');
+            const panel = this.nextElementSibling;
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+            } else {
+                panel.style.display = 'block';
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

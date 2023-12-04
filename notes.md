@@ -41,6 +41,7 @@ consumption of the various processes within the containers.
 <img src="images/docker-container-arch.png">
 
 ## Docker API
+[Docker-API]
 
 https://docs.docker.com/engine/api/v1.43/#tag/Container/operation/ContainerTop
 
@@ -149,15 +150,16 @@ https://community.pivotal.io/s/article/Explaining-Four-Basic-Modes-of-Docker-Net
 
 ## Insight from a Docker Container Introspection 
 
+[TOOLS]
 ```
 introspection tools, which are able to acquire data
 from a system as it is running, can be utilized as both
 an early warning system to protect that system and as
 a data capture system that collects data that would be
 valuable from a digital forensic perspective.
-```
 
-```
+(...)
+
 the data about containers must be accessed/collected
 while they are executing. In order to access this data,
 application programming interfaces (APIs) have been
@@ -179,6 +181,8 @@ for performing a security analysis of containerized
 software. 
 ```
 
+
+[TOOLS][VMS]
 ```
 Whereas previous approaches dealt with
 hypervisors and/or underlying systems in cloud
@@ -195,6 +199,7 @@ intensive workloads. They determined different tools
 present similar but not completely equal results.
 ```
 
+[Docker-Swarm]
 ```
 he previous studies concentrated on gathering
 behavior and performance evidence of various types;
@@ -216,6 +221,7 @@ comparing the two systems.
 
 ### Experiment
 
+[Prometheus]
 ```
 Prometheus is an open source introspection tool
 that provides the ability to check multiple nodes in a
@@ -238,6 +244,7 @@ Docker environment
 ## Forensic Analysis of Docker Swarm Cluster using Grr Rapid Response Framework
 
 
+[Docker-usage]
 ```
 Currently, Docker is one of the container ma-
 chines implemented by almost 25% of the world’s Internet
@@ -256,6 +263,8 @@ It's mostly about network analysis, and Grr Rapid Response Framework, not very u
 
 ## A Method of Docker Container Forensics Based on API
 
+
+[Docker-API]
 ```
 The paper explains Docker service principles and structural
 features, and analyzing the model and method of forensics in
@@ -274,6 +283,7 @@ original evidence data protection.
 
 ### At this stage, Docker container forensics mainly faces the following problems:
 
+[Docker-Problems]
 ```
 1) Evidence Volatility: The Docker container application service
 is deployed on the cloud server. After the container is deleted, the
@@ -308,8 +318,10 @@ hosts.
 
 This is very similar to what we wanna do.
 
-**Analysis of the Docker Directory**
+[Docker-API]
 
+**Analysis of the Docker Directory**
+[Docker-Images]
 ```
 1) The graph directory to store all the image's description file. For
 each image layer, the graph directory has two files json and
@@ -319,6 +331,7 @@ layersize records the size of the Docker image, and the complete
 data of the image itself is stored in the/var/lib/docker/aufs/diff
 directory.
 ```
+[Docker-Container]
 ```
 2) Containers stored in the container directory configuration
 information, the configuration information contains all the
@@ -335,6 +348,7 @@ container|
 | hosts | define the container's routing table |
 | resolv.config | define the container's DNS server address|
 | resolv.config.hash |the hash value of the resolv.config file|
+[Docker-Volume]
 ```
 3) The Docker data volume is a mechanism introduced for the
 sharing and persistence of files and folders between containers
@@ -350,7 +364,7 @@ this reflection is bidirectional.
 
 <img src="images/docker-api-6.png">
 
-
+[Docker-API]
 ```
 Using the related APIs, we can Program using docker-py
 libraries from Docker's official portals for listing containers,
@@ -1140,3 +1154,9 @@ Checkpoint/Restore In Userspace, or CRIU (pronounced kree-oo, IPA: /krɪʊ/, Rus
 CRIU started as a project of Virtuozzo, and grew with the tremendous help from the community. It is currently used by (integrated into) OpenVZ, LXC/LXD, Docker, Podman, and other software, and packaged for many Linux distributions. 
 
 https://github.com/checkpoint-restore/criu
+
+## Docker Statistics - CPU, MEMORY, I/O NETWORK, READ/WRITE DISK
+
+https://www.docker.com/blog/how-to-monitor-container-memory-and-cpu-usage-in-docker-desktop/
+
+```docker stats```
