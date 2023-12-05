@@ -24,10 +24,22 @@ def index():
 def inspect_container(container_id):
 
    # Fetch detailed data
-   endpoint = "container/" + container_id + "/json" 
-   data = http_utils.get_json_from_endpoint(endpoint)
+   endpoint = "containers/" + container_id + "/json" 
+   container_data = http_utils.get_json_from_endpoint(endpoint)
 
-   return render_template('container_inspection.html', container_data=data)
+
+   return render_template('container_inspection.html', container_data=container_data)
+
+
+@app.route('/container/<container_id>/json')
+def inspect_container_raw(container_id):
+
+   # Fetch detailed data
+   endpoint = "containers/" + container_id + "/json" 
+   container_data = http_utils.get_json_from_endpoint(endpoint)
+
+
+   return container_data
 
 # main driver function
 if __name__ == '__main__':

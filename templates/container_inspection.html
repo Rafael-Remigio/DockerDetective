@@ -4,65 +4,124 @@
 <head>
     <meta charset="UTF-8">
     <title>Container Inspection</title>
-    <style>
-        /* Styles for container inspection page */
-        .container-info {
-            padding: 0 18px;
-            border-radius: 25px;
-            ;
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-            display: none;
-            overflow: hidden;
-            background-color: rgb(228, 228, 221);
-        }
-
-        .container-info h2 {
-            margin-top: 0;
-        }
-
-        .container-info p {
-            margin: 5px 0;
-        }
-    </style>
 </head>
 
 <body>
-    <h1>Container Inspection</h1>
 
-    <div class="container-info">
-        <h2>Container Details</h2>
-        <p>ID: {{ container_data.Id }}</p>
-        <p>Name: {{ container_data.Name }}</p>
-        <p>Image: {{ container_data.Image }}</p>
-        <!-- Add more details as needed -->
+    <button id="downloadBtn">Download JSON</button>
+
+    <div class="container mt-4">
+        <h1>Container Information</h1>
+        <div class="row mt-4">
+            <!-- Container Basic Details -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Container Basic Details</h3>
+                        <p><strong>Name:</strong> {{ container_data.Name }}</p>
+                        <p><strong>ID:</strong> {{ container_data.Id[:25] }}(...)</p>
+
+                        <p><strong>Status:</strong> {{ container_data.State.Status }}</p>
+                        <p><strong>Image:</strong> {{container_data.Config.Image }}</p>
+                        <p><strong>Created:</strong> {{container_data.Created }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Container Network Configuration -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Container Network Configuration</h3>
+                        <p><strong>Network Mode:</strong> {{ container_data.HostConfig.NetworkMode }}</p>
+                        <p><strong>Hostname:</strong> {{ container_data.Config.Hostname }}</p>
+
+                        {% if container_data.Config.ExposedPorts %}
+
+                        {% for key in container_data.Config.ExposedPorts.keys() %}
+
+                        <p><strong>Exposed Ports:</strong> {{ key }}</p>
+
+                        {% endfor %}
+                        {% endif %}
+
+                        <!-- Add more network-related details here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <!-- Container State -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Container State</h3>
+                        <p><strong>Status:</strong>{{ container_data.State.Status }}</p>
+                        <p><strong>Started At:</strong> {{ container_data.State.StartedAt }}</p>
+                        <!-- Add more state-related details here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mounts -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Mounts</h3>
+                        {% for mount in container_data.Mounts %}
+                        <p><strong>Name: </strong> {{ mount.Name }}</p>
+                        <p><strong>Source: </strong> {{ mount.Source }}</p>
+                        <p><strong>Destination: </strong> {{ mount.Destination }}</p>
+                        <!-- Add more mount details -->
+                        {% endfor %}
+                        <!-- Add more mount-related details here -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 
-    <div class="container-info">
-        <h2>Container Configuration</h2>
-        <p>Hostname: {{ container_data.Config.Hostname }}</p>
-        <p>Network Mode: {{ container_data.HostConfig.NetworkMode }}</p>
-        <!-- Add more configuration details -->
-    </div>
 
-    <div class="container-info">
-        <h2>Container State</h2>
-        <p>Status: {{ container_data.State.Status }}</p>
-        <p>Running: {{ container_data.State.Running }}</p>
-        <!-- Add more state details -->
-    </div>
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <div class="container-info">
-        <h2>Mounts</h2>
-        {% for mount in container_data.Mounts %}
-        <p>Name: {{ mount.Name }}</p>
-        <p>Source: {{ mount.Source }}</p>
-        <p>Destination: {{ mount.Destination }}</p>
-        <!-- Add more mount details -->
-        {% endfor %}
-    </div>
 
-    <!-- Add more sections as needed -->
+    <script>
+        document.getElementById('downloadBtn').addEventListener('click', function () {
+            const xhr = new XMLHttpRequest();
+            const url = window.location.href + '/json'; // Replace this with the actual endpoint on your server
+
+            xhr.open('GET', url);
+            xhr.responseType = 'blob';
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const blob = new Blob([xhr.response], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'data.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } else {
+                    console.error('Request failed. Status: ' + xhr.status);
+                    alert('Failed to download JSON. Please try again.');
+                }
+            };
+
+            xhr.send();
+        });
+    </script>
+
 
 </body>
 
