@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Docker Images and Container IDs</title>
     <style>
         /* Styling for the accordion */
         .accordion {
-            background-color: #90ec45;
+            background-color: #45e6ec;
             color: rgb(51, 51, 51)000;
             cursor: pointer;
             padding: 18px;
             width: 100%;
             border: none;
+            border-radius: 25px;;
             text-align: left;
             outline: none;
             transition: 0.4s;
@@ -19,25 +21,50 @@
 
         .panel {
             padding: 0 18px;
+            border-radius: 25px;;
+
             display: none;
             overflow: hidden;
-            background-color: white;
+            background-color: rgb(228, 228, 221);
         }
 
         .panel p {
             margin: 0;
         }
+
+         /* Style for the inspection button */
+         .inspect-button {
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .inspect-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
+
 <body>
 
-<!-- Accordions for Docker Container IDs -->
-<h2>Active Docker Containers</h2>
+    <!-- Accordions for Docker Container IDs -->
+    <h2>Active Docker Containers</h2>
 
-{% for container in containers %}
+    {% for container in containers %}
     {% if container.State == "running" %}
     <button class="accordion">{{ container.Id }}</button>
     <div class="panel">
+        <br>
+        <p>
+            <a href="/container/{{ container.Id }}">
+                <button class="inspect-button">Inspect</button>
+            </a>
+        </p>
         <p>ID: {{ container.Id }}</p>
         <p>Names: {{ container.Names | join(', ') }}</p>
         <p>Image: {{ container.Image }}</p>
@@ -47,7 +74,8 @@
         <p>Ports:</p>
         <ul>
             {% for port in container.Ports %}
-            <li>IP: {{ port.IP }}, Private Port: {{ port.PrivatePort }}, Public Port: {{ port.PublicPort }}, Type: {{ port.Type }}</li>
+            <li>IP: {{ port.IP }}, Private Port: {{ port.PrivatePort }}, Public Port: {{ port.PublicPort }}, Type: {{
+                port.Type }}</li>
             {% endfor %}
         </ul>
         <p>State: {{ container.State }}</p>
@@ -67,15 +95,21 @@
         </ul>
     </div>
     {% endif %}
-{% endfor %}
+    {% endfor %}
 
 
-<!-- Accordions for Docker Container IDs -->
-<h2>All Docker Containers</h2>
+    <!-- Accordions for Docker Container IDs -->
+    <h2>All Docker Containers</h2>
 
-{% for container in containers %}
+    {% for container in containers %}
     <button class="accordion">{{ container.Id }}</button>
     <div class="panel">
+        <br>
+        <p>
+            <a href="/container/{{ container.Id }}">
+                <button class="inspect-button">Inspect</button>
+            </a>
+        </p>
         <p>ID: {{ container.Id }}</p>
         <p>Names: {{ container.Names | join(', ') }}</p>
         <p>Image: {{ container.Image }}</p>
@@ -85,7 +119,8 @@
         <p>Ports:</p>
         <ul>
             {% for port in container.Ports %}
-            <li>IP: {{ port.IP }}, Private Port: {{ port.PrivatePort }}, Public Port: {{ port.PublicPort }}, Type: {{ port.Type }}</li>
+            <li>IP: {{ port.IP }}, Private Port: {{ port.PrivatePort }}, Public Port: {{ port.PublicPort }}, Type: {{
+                port.Type }}</li>
             {% endfor %}
         </ul>
         <p>State: {{ container.State }}</p>
@@ -104,11 +139,11 @@
             {% endfor %}
         </ul>
     </div>
-{% endfor %}
+    {% endfor %}
 
 
-<h2>Docker Images</h2>
-{% for image in images %}
+    <h2>Docker Images</h2>
+    {% for image in images %}
     <button class="accordion">{{ image.RepoTags[0]}}</button>
     <div class="panel">
         <p>Containers: {{ image.Containers }}</p>
@@ -139,26 +174,27 @@
         <p>Size: {{ image.Size }}</p>
         <p>Virtual Size: {{ image.VirtualSize }}</p>
     </div>
-{% endfor %}
+    {% endfor %}
 
 
 
-<script>
-    // JavaScript to toggle the accordion panels
-    const accordions = document.querySelectorAll('.accordion');
+    <script>
+        // JavaScript to toggle the accordion panels
+        const accordions = document.querySelectorAll('.accordion');
 
-    accordions.forEach(accordion => {
-        accordion.addEventListener('click', function() {
-            this.classList.toggle('active');
-            const panel = this.nextElementSibling;
-            if (panel.style.display === 'block') {
-                panel.style.display = 'none';
-            } else {
-                panel.style.display = 'block';
-            }
+        accordions.forEach(accordion => {
+            accordion.addEventListener('click', function () {
+                this.classList.toggle('active');
+                const panel = this.nextElementSibling;
+                if (panel.style.display === 'block') {
+                    panel.style.display = 'none';
+                } else {
+                    panel.style.display = 'block';
+                }
+            });
         });
-    });
-</script>
+    </script>
 
 </body>
+
 </html>

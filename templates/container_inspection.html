@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Container Inspection</title>
+    <style>
+        /* Styles for container inspection page */
+        .container-info {
+            padding: 0 18px;
+            border-radius: 25px;
+            ;
+
+            display: none;
+            overflow: hidden;
+            background-color: rgb(228, 228, 221);
+        }
+
+        .container-info h2 {
+            margin-top: 0;
+        }
+
+        .container-info p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Container Inspection</h1>
+
+    <div class="container-info">
+        <h2>Container Details</h2>
+        <p>ID: {{ container_data.Id }}</p>
+        <p>Name: {{ container_data.Name }}</p>
+        <p>Image: {{ container_data.Image }}</p>
+        <!-- Add more details as needed -->
+    </div>
+
+
+    <div class="container-info">
+        <h2>Container Configuration</h2>
+        <p>Hostname: {{ container_data.Config.Hostname }}</p>
+        <p>Network Mode: {{ container_data.HostConfig.NetworkMode }}</p>
+        <!-- Add more configuration details -->
+    </div>
+
+    <div class="container-info">
+        <h2>Container State</h2>
+        <p>Status: {{ container_data.State.Status }}</p>
+        <p>Running: {{ container_data.State.Running }}</p>
+        <!-- Add more state details -->
+    </div>
+
+    <div class="container-info">
+        <h2>Mounts</h2>
+        {% for mount in container_data.Mounts %}
+        <p>Name: {{ mount.Name }}</p>
+        <p>Source: {{ mount.Source }}</p>
+        <p>Destination: {{ mount.Destination }}</p>
+        <!-- Add more mount details -->
+        {% endfor %}
+    </div>
+
+    <!-- Add more sections as needed -->
+
+</body>
+
+</html>
