@@ -7,6 +7,20 @@
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
+    <style>
+
+    .mod {
+      color: green;
+    }
+    .del {
+      color: red;
+    }
+    .add {
+      color: blue;
+    }
+
+    </style>
+
 </head>
 
 <body>
@@ -97,17 +111,42 @@
                         <h3 class="card-title">Running Processes</h3>
                         {% for process in container_processes.Processes %}
                         <ul class="list-group"></ul>
-                        <li class="list-group-item"><strong>UID:</strong>{{ process[0] }}</li>
-                        <li class="list-group-item"><strong>Command:</strong> {{ process[7] }}</li>
-                    </ul>
+                            <li class="list-group-item"><strong>UID:</strong>{{ process[0] }}</li>
+                            <li class="list-group-item"><strong>Command:</strong> {{ process[7] }}</li>
+                        </ul>
+                        <br>
                         {% endfor %}
 
                     </div>
                 </div>
             </div>
 
-           
+           <!-- Container Processes -->
+           <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">FileSystem Changes</h3>
+                    {% if container_changes%}
+                    {% for change in container_changes %}
+                        {% if change.Kind == 0 %}
+                        <p><strong class="mod">Modified:</strong>{{change.Path}}</p>
+                        {% endif %}
+                        {% if change.Kind == 1 %}
+                        <p><strong class="add">Added:</strong>{{change.Path}}</p>
+                        {% endif %}
+                        {% if change.Kind == 2 %}
+                        <p><strong class="del">Deleted:</strong>{{change.Path}}</p>
+                        {% endif %}
+                    {% endfor %}
+                    {% endif %}
+
+                </div>
+            </div>
         </div>
+
+        </div>
+
+
     </div>
 
 

@@ -33,7 +33,12 @@ def inspect_container(container_id):
    endpoint = "containers/" + container_id + "/top" 
    container_processes = http_utils.get_json_from_endpoint(endpoint)
 
-   return render_template('container_inspection.html', container_data=container_data, container_processes=container_processes)
+
+   # Fetch file system changes
+   endpoint = "containers/" + container_id + "/changes" 
+   container_changes = http_utils.get_json_from_endpoint(endpoint)
+
+   return render_template('container_inspection.html', container_data=container_data, container_processes=container_processes, container_changes=container_changes)
 
 
 @app.route('/container/<container_id>/json')
