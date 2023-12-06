@@ -11,10 +11,15 @@
 
 <body>
 
-    <button id="downloadBtn">Download JSON</button>
 
     <div class="container mt-4">
         <h1>Container Information</h1>
+
+        <button type="button" class="btn btn-outline-danger" id="downloadMetadata">Dump Metada</button>
+        <button type="button" class="btn btn-outline-danger" id="downloadProcesses">Dump Processes</button>
+        <button type="button" class="btn btn-outline-danger" id="downloadResources">Resource Usage</button>
+        <button type="button" class="btn btn-outline-danger" id="downloadFileSystem">Dump FileSystem</button>
+
         <div class="row mt-4">
             <!-- Container Basic Details -->
             <div class="col-md-6">
@@ -83,6 +88,26 @@
                 </div>
             </div>
         </div>
+
+        <div class="row mt-4">
+            <!-- Container Processes -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Running Processes</h3>
+                        {% for process in container_processes.Processes %}
+                        <ul class="list-group"></ul>
+                        <li class="list-group-item"><strong>UID:</strong>{{ process[0] }}</li>
+                        <li class="list-group-item"><strong>Command:</strong> {{ process[7] }}</li>
+                    </ul>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+
+           
+        </div>
     </div>
 
 
@@ -93,7 +118,7 @@
 
 
     <script>
-        document.getElementById('downloadBtn').addEventListener('click', function () {
+        document.getElementById('downloadMetadata').addEventListener('click', function () {
             const xhr = new XMLHttpRequest();
             const url = window.location.href + '/json'; // Replace this with the actual endpoint on your server
 
@@ -115,6 +140,90 @@
                 } else {
                     console.error('Request failed. Status: ' + xhr.status);
                     alert('Failed to download JSON. Please try again.');
+                }
+            };
+
+            xhr.send();
+        });
+
+        document.getElementById('downloadProcesses').addEventListener('click', function () {
+            const xhr = new XMLHttpRequest();
+            const url = window.location.href + '/top'; // Replace this with the actual endpoint on your server
+
+            xhr.open('GET', url);
+            xhr.responseType = 'blob';
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const blob = new Blob([xhr.response], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'data.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } else {
+                    console.error('Request failed. Status: ' + xhr.status);
+                    alert('Failed to download JSON. Is the container running?');
+                }
+            };
+
+            xhr.send();
+        });
+        document.getElementById('downloadResources').addEventListener('click', function () {
+            const xhr = new XMLHttpRequest();
+            const url = window.location.href + '/stats'; // Replace this with the actual endpoint on your server
+
+            xhr.open('GET', url);
+            xhr.responseType = 'blob';
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const blob = new Blob([xhr.response], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'data.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } else {
+                    console.error('Request failed. Status: ' + xhr.status);
+                    alert('Failed to download JSON. Is the container running?');
+                }
+            };
+
+            xhr.send();
+        });
+
+
+        document.getElementById('downloadFileSystem').addEventListener('click', function () {
+            const xhr = new XMLHttpRequest();
+            const url = window.location.href + '/export'; // Replace this with the actual endpoint on your server
+
+            xhr.open('GET', url);
+            xhr.responseType = 'blob';
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const blob = new Blob([xhr.response], { type: 'application/x-tar' });
+                    const url = URL.createObjectURL(blob);
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'fileSystem.tar';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } else {
+                    console.error('Request failed. Status: ' + xhr.status);
+                    alert('Failed to download tar. Is the container running?');
                 }
             };
 
