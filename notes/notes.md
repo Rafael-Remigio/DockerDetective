@@ -517,6 +517,7 @@ files can be extracted from the directory of the underlying layer containing the
 
 ### Processes
 
+
 ```
 The PIDs on the host are always unique, only the PID within the container can
 be displayed identically to a PID on the host. This fact becomes relevant when log files contain PIDs and
@@ -1160,3 +1161,22 @@ https://github.com/checkpoint-restore/criu
 https://www.docker.com/blog/how-to-monitor-container-memory-and-cpu-usage-in-docker-desktop/
 
 ```docker stats```
+
+
+
+
+Container networking refers to the ability for containers to connect to and communicate with each other, or to non-Docker workloads.
+A container has no information about what kind of network it's attached to, or whether their peers are also Docker workloads or not. A container only sees a network interface with an IP address, a gateway, a routing table, DNS services, and other networking details. 
+
+Docker's networking subsystem is pluggable, using drivers/modes. Several drivers exist by default, and provide core networking functionality:
+
+Bridge/Default Mode Networking: Bridge networks are commonly used when your application runs in a container that needs to communicate with other containers on the same ho
+
+host: Remove network isolation between the container and the Docker host, and use the host's networking directly
+
+overlay: Overlay networks connect multiple Docker daemons together and enable Used for docker swarms
+
+Vlans: Macvlan networks are best when you are migrating from a VM setup or need your containers to look like physical hosts on your network, each with a unique MAC address.
+IPvlan is similar to Macvlan, but doesn't assign unique MAC addresses to containers. Consider using IPvlan when there's a restriction on the number of MAC addresses that can be assigned to a network interface or port.
+
+none Completely isolate a container from the host and other containers
