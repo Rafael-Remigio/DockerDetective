@@ -1122,7 +1122,7 @@ Within the network analysis container, use tools like Wireshark to capture and a
 
 1. run an interactive session inside the container:
     ```docker exec -it <container name or ir> /bin/bash```
-2. run volatility from inside the container. Profile should be the containers OS
+2. run volatility from inside the container. Profile should be the containers OS, usually ubunto or alpine
     ```volatility -f /proc/kcore --profile=<profile> pslist
 3. on host, extract the dump
     ```docker exec <container name> cat /proc/kcore > memory_dump
@@ -1141,9 +1141,10 @@ I used GNU Debugger or gdb for generating the core sump for a container from out
 
     "sudo docker ps -a | grep service_container_name" to get the container id.
     "sudo docker inspect [container id] | more" to get the parent PID
-    "pstree -pg [parent pid]" to get the child PID
-    "sudo ps -aux | grep [child pid]"
-    "sudo gcore PID"
+
+    docker inspect -f '{{.State.Pid}}' <CONTAINER ID> #to get the parent PID
+    pstree -pg [parent pids] # to get the child PID
+    sudo gcore PID # dump memory with gcore
 ```
 
 
